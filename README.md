@@ -1,5 +1,6 @@
 # Securing and Hardening a Linux System
-![Screenshot 2023-10-06 200219](https://github.com/Lachiecodes/Securing-and-Hardening-a-Linux-System/assets/138475757/06cb9404-5fad-4cf9-8eee-5bf444ca2dab)
+
+![Screenshot 2023-10-06 200655](https://github.com/Lachiecodes/Securing-and-Hardening-a-Linux-System/assets/138475757/e25b7275-f2f1-465c-b9be-1d0e83f1060a)
 
 
 ## Introduction
@@ -100,5 +101,43 @@ In this project I demonstrate a number of different ways in which you can config
 
 - Now restart the system and you should be prompted for a password at boot.<br>
 
-![Screenshot 2023-10-06 200002](https://github.com/Lachiecodes/Securing-and-Hardening-a-Linux-System/assets/138475757/ed1d6621-b8aa-4708-8bd2-4edbe45b8def)
+![Screenshot 2023-10-06 200002](https://github.com/Lachiecodes/Securing-and-Hardening-a-Linux-System/assets/138475757/ba222826-baa8-46b7-9a3f-3bbe2ad1cde9)
 
+## Enforcing Password Policy
+- Password policy is just as good as the strength of the users passwords.
+- Password policies are a set of rules which must be satisfied. They usually include password age, length and complexity, number of login failures, and whether reusing old passwords is permitted.
+- Password aging and length settings are defined in the following file: `sudo nano /etc/login.defs`.<br>
+
+![Screenshot 2023-09-29 091249](https://github.com/Lachiecodes/Securing-and-Hardening-a-Linux-System/assets/138475757/081a9e6b-d789-4ae6-87d9-2002ab5a54a2)<br>
+
+- Note that all the parameters in login.defs are only applicable to new accounts and not existing ones.
+- You can configure the maximum number of days a password can be used, the minimum number of days allowed between password changes and the number of days warning given before the password expires.
+- Another password settings that is not showed in the file but exists is PASS_MIN_LENGTH. You can add it to the file and set it to a length greater than 12, which is an acceptable length.
+- You can use the command `man login.defs` to check any other parameters that you may want to add to your password policy.
+- To change the password expiry policy for existing accounts use the `chage` command.
+- For example, to change the number of days between password change, use the command `sudo chage -M 60 user`.
+- You can check that the settings have worked using `sudo chage -l user`.<br>
+
+![Screenshot 2023-09-29 092556](https://github.com/Lachiecodes/Securing-and-Hardening-a-Linux-System/assets/138475757/72d318e2-b049-4ea5-9831-1528414b8311)<br>
+
+- To enforce password complexity on most Linux distributions we use PAM, which means pluggable authentication module.
+- The configuration file for pam can be found in `/etc/pam.d/common-password` on Ubuntu based systems.
+- To use PAM on Ubuntu based systems, make sure the following package is installed using: `sudo apt install libpam-pwquality`.
+- Open the common password file in your favourite text editor: `sudo nano /etc/pam.d/common-password`.<br>
+
+![Screenshot 2023-09-29 094607](https://github.com/Lachiecodes/Securing-and-Hardening-a-Linux-System/assets/138475757/4e908792-bae7-4777-b2a3-7c95b288b95e)<br>
+
+- Find the line with pam_pwquality.so and add the following attributes: `retry=3 minlen=12 difok=3 ucredit=-1 lcredit=-1 dcredit=-1 ocredit=-1`.
+- `retry=3` will prompt the user 3 times before exiting and returning an error.
+- `minlen=12` specifies that the password can not be less than 12 characters.
+- `difok=3` sets the minimum number of characters that must be different from the old password.
+- `ucredit=-1` requires at least one uppercase character in the password.
+- `lcredit=-1` requires at least one lowercase character in the password.
+- `dcredit=-1` requires at least one numerical character in the password.
+- `ocredit=-1` requires at least one special character in the password.<br>
+
+![Screenshot 2023-09-29 094945](https://github.com/Lachiecodes/Securing-and-Hardening-a-Linux-System/assets/138475757/1c516974-3a3f-45e8-8fc5-7574409c197e)<br>
+
+- Now that you have set these requirements, try to change your password to something that doesn’t fit and make sure that its all working!<br>
+
+  ![Screenshot 2023-09-29 095338](https://github.com/Lachiecodes/Securing-and-Hardening-a-Linux-System/assets/138475757/14e495cc-8608-4412-ba45-271085d6c5f9)
