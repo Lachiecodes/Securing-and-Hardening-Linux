@@ -26,8 +26,9 @@ In this project I demonstrate a number of different ways in which you can config
 
 ## Securing the OpenSSH Server
 
-- Configuring SSH settings by editing the sshd_config file located in /etc/ssh/ with the command `sudo nano /etc/ssh/sshd_config`.
-  ![Screenshot 2023-09-28 215038](https://github.com/Lachiecodes/Securing-and-Hardening-a-Linux-System/assets/138475757/7f02903a-a8e9-4bf0-82f3-2cfb3026d5c6)
+- Configuring SSH settings by editing the sshd_config file located in /etc/ssh/ with the command `sudo nano /etc/ssh/sshd_config`.<br>
+
+  ![Screenshot 2023-09-28 215038](https://github.com/Lachiecodes/Securing-and-Hardening-a-Linux-System/assets/138475757/7f02903a-a8e9-4bf0-82f3-2cfb3026d5c6)<br>
 
 - Make sure to create a backup of the sshd file before you edit it.
 - After editing the file you will have to restart the server so that the changes will come into affect.
@@ -36,7 +37,10 @@ In this project I demonstrate a number of different ways in which you can config
 - PermitRootLogin by default is set to prohibit-password but this still allows public key authentication and other such methods. It’s safer to disallow this one: `PermitRootLogin no`.
 - Limit users SSH access by specifying the allowed users with: `AllowUsers user1 user2 user3`.
 - Configure an idle timeout interval to automatically log out clients that have been inactive for a certain period of time: `ClientAliveInterval 300` and `ClientAliveCountMax 0`.
-- Another good setting to configure is the `MaxAuthTries` and `MaxStartups`.
-![Screenshot 2023-09-28 220335](https://github.com/Lachiecodes/Securing-and-Hardening-a-Linux-System/assets/138475757/de7da639-1bcc-4ec3-92b4-7df6c562671d)
+- Another good setting to configure is the `MaxAuthTries` and `MaxStartups`. <br>
 
-- You can also restrict SSH access to only allow connections from certain IP addresses using iptables to specify the address: `iptables -A INPUT -p tcp —dport 2278 -s x.x.x.x -j ACCEPT` and drop all other incoming connections:`iptables -A INPUT -p tcp —dport 2278 -j DROP`.
+![Screenshot 2023-09-28 220335](https://github.com/Lachiecodes/Securing-and-Hardening-a-Linux-System/assets/138475757/de7da639-1bcc-4ec3-92b4-7df6c562671d)<br>
+
+- You can also restrict SSH access to only allow connections from certain IP addresses using `iptables` to specify the address: `iptables -A INPUT -p tcp —dport 2278 -s x.x.x.x -j ACCEPT` and drop all other incoming connections:`iptables -A INPUT -p tcp —dport 2278 -j DROP`.<br>
+
+![Screenshot 2023-09-28 220156](https://github.com/Lachiecodes/Securing-and-Hardening-a-Linux-System/assets/138475757/0aeeb8b1-dd9b-4475-8589-6da0b47eb3f9)
