@@ -140,4 +140,4 @@ In this project I demonstrate a number of different ways in which you can config
 
 - Now that you have set these requirements, try to change your password to something that doesn’t fit and make sure that its all working!<br>
 
-  ![Screenshot 2023-09-29 095338](https://github.com/Lachiecodes/Securing-and-Hardening-a-Linux-System/assets/138475757/14e495cc-8608-4412-ba45-271085d6c5f9)
+![Screenshot 2023-09-29 095338](https://github.com/Lachiecodes/Securing-and-Hardening-a-Linux-System/assets/138475757/14e495cc-8608-4412-ba45-271085d6c5f9)
