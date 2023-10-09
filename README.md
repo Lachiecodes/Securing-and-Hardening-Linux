@@ -31,7 +31,7 @@ In this project I demonstrate a number of different ways in which you can config
 
 - Configuring SSH settings by editing the sshd_config file located in /etc/ssh/ with the command `sudo nano /etc/ssh/sshd_config`.<br>
 
-  ![Screenshot 2023-09-28 215038](https://github.com/Lachiecodes/Securing-and-Hardening-a-Linux-System/assets/138475757/7f02903a-a8e9-4bf0-82f3-2cfb3026d5c6)<br>
+![Screenshot 2023-09-28 215038](https://github.com/Lachiecodes/Securing-and-Hardening-a-Linux-System/assets/138475757/7f02903a-a8e9-4bf0-82f3-2cfb3026d5c6)<br>
 
 - Make sure to create a backup of the sshd file before you edit it.
 - After editing the file you will have to restart the server so that the changes will come into affect.
@@ -141,3 +141,82 @@ In this project I demonstrate a number of different ways in which you can config
 - Now that you have set these requirements, try to change your password to something that doesn’t fit and make sure that its all working!<br>
 
 ![Screenshot 2023-09-29 095338](https://github.com/Lachiecodes/Securing-and-Hardening-a-Linux-System/assets/138475757/14e495cc-8608-4412-ba45-271085d6c5f9)
+
+## Locking or Disabling User Accounts
+- There are several ways in which a user account can be locked or disabled.
+- One way in which we can do this is to lock password authentication for the user. Note that this does not entirely lock the user out of the account - they will still be able to log in using SSH public key authentication if it’s set.
+- Run the command: `sudo passwd -l user`.<br>
+
+![Screenshot 2023-10-03 091451](https://github.com/Lachiecodes/Securing-and-Hardening-a-Linux-System/assets/138475757/3fe3046f-03eb-4e0e-be90-4ea23d96e566)<br>
+
+- To verify if the account is locked or disabled run the command: `sudo passwd —status user`. If you see a capital L it means its locked, NP means there is no password, and P means there is a valid password.
+- You can also check the hash of the password using: `sudo cat /etc/shadow`. The password will have an ! at the front of it, which is not a valid file hash.<br>
+
+![Screenshot 2023-10-03 091523](https://github.com/Lachiecodes/Securing-and-Hardening-a-Linux-System/assets/138475757/c971557d-6df3-4070-9Givi9f2-b57316316925)<br>
+
+- To unlock the user user account, use the command: `sudo passwd -u user`.<br>
+
+![Screenshot 2023-10-03 091919](https://github.com/Lachiecodes/Securing-and-Hardening-a-Linux-System/assets/138475757/0eaad4c1-6cf0-497d-ae55-c52e7f3b20d6)<br>
+
+- To completely disable an account use the command: `sudo usermod —expiredate 1 user`. This sets the users account expiry date to 1 day after the Unix epoch, which is 00:00:00 UTC on 1 January 1 1970.
+- To check the expiration date run: `sudo chage -l user` and you should see the expiration date as the 02 January 1970.<br>
+
+![Screenshot 2023-10-03 092218](https://github.com/Lachiecodes/Securing-and-Hardening-a-Linux-System/assets/138475757/d0566ddf-cbb3-4f8a-b81e-f5c1277c8725)<br>
+
+- To reenable the account, you can use the command: `sudo usermod —expiredate "" user`.<br>
+
+![Screenshot 2023-10-03 092329](https://github.com/Lachiecodes/Securing-and-Hardening-a-Linux-System/assets/138475757/4446984d-3349-4a8b-b677-9e6183b99c46)
+
+## Giving Limited root Privileges
+- In Linux, any administrative command that changes the system in any way should be run as root.
+- The users that belong to the sudo group are allowed to run commands as root by using sudo before the command name.
+- To see the users that belong to the sudo group run: `grep sudo /etc/group`.<br>
+
+![Screenshot 2023-10-03 093050](https://github.com/Lachiecodes/Securing-and-Hardening-a-Linux-System/assets/138475757/9f180bba-b919-493a-8754-4b231fa3c729)<br>
+
+- Initially, only the user that was created during system installation is allowed to run commands as sudo.
+- The admin can add other users to the sudo group and they will be allowed to run commands as sudo aswell.
+- The sudo command will request the password of the current user, not the root password.
+- By running sudo su you can become root temporarily until you log out.
+- One possible problem of this approach, is that such a user is allowed to run any commands as root. It’s not possible to restrict their access to some parts of the system or some commands.
+- For example, if you want a user to be able to update a system without being able to change the configuration of the web server, the classical approach doesn’t allow that.
+- We can give limited privilege access to users or groups and configure per command privilege access by editing the sudoers configuration file located at `/etc/sudoers`.
+- Due to it being possible to break the system with improper syntax when editing this file, it is not recommended to edit the file directly with a normal text editor.
+- Always use the visudo command instead, as it validates the syntax of the file before saving to ensure.
+- By default, the command uses Vim as the text editor, but you can configure it using the command: `sudo update-alternatives —config editor`. I prefer to use nano.<br>
+
+![Screenshot 2023-10-03 122115](https://github.com/Lachiecodes/Securing-and-Hardening-a-Linux-System/assets/138475757/1739844c-d5e4-4080-98ff-9fe3f9657d96)<br>
+
+- For an example, I will make a new user called user1 and edit their privileges: `sudo useradd -d /home/user1 -m -s  /bin/bash user1`.
+- For now, try running the command `sudo cat /etc/shadow` as user1.<br>
+
+![Screenshot 2023-10-03 094628](https://github.com/Lachiecodes/Securing-and-Hardening-a-Linux-System/assets/138475757/0862f46c-7aa7-43cf-80bd-a00c11ef2049)<br>
+
+- We get an error that user1 is not in the sudoers file and that the incident has been reported.
+- Now, to edit the file run the command: `sudo visudo`. We are going to allow user1 to have root access to the commands `ls` and `cat`.
+- In the # User privilege specification section, add the line: `user1 ALL=(root) /usr/bin/ls,/usr/bin/cat`.
+- We need to provide the absolute file paths to the commands. These can be found using the command `which` for example `which cat`, `which ls` or `which apt`.
+
+![Screenshot 2023-10-03 094907](https://github.com/Lachiecodes/Securing-and-Hardening-a-Linux-System/assets/138475757/b26131bc-9d0e-46c7-970b-3eb3e05197b6)<br>
+
+- Try to run the command `sudo cat /etc/shadow` as user1. As you can see it works now.<br>
+
+![Screenshot 2023-10-03 095013](https://github.com/Lachiecodes/Securing-and-Hardening-a-Linux-System/assets/138475757/3fcc07e4-e1e4-41b2-8f9d-d57c4c496b6b)<br>
+
+- Try to also run the command `sudo apt update` as user1. You will find that you get an error.<br>
+
+![Screenshot 2023-10-03 095048](https://github.com/Lachiecodes/Securing-and-Hardening-a-Linux-System/assets/138475757/90db6825-4da9-4dbd-8bc3-d29c992465bc)<br>
+
+- You can also use `PASSWD:` and `NOPASSWD:` before the absolute paths to specify whether to prompt the user for a password when using these commands.
+- You can also group users in the alias section of the configuration file to easily specify privileges for different departments in an organisation.
+- For this we will need a second user account, so run the command: `sudo useradd -d /home/user2 -m -s  /bin/bash user2`.
+- For example, in the #User alias specification section we will add the line: `User_Alias MYADMIN=user1,user2`.
+- Then, in the #User privilege specification, add the line: `MYADMIN ALL=(root) /usr/bin/netstat,FILE`.<br>
+
+![Screenshot 2023-10-03 122146](https://github.com/Lachiecodes/Securing-and-Hardening-a-Linux-System/assets/138475757/db4d5426-ab95-4a8c-93b3-4703ca319f6c)<br>
+
+- Test out the commands on both accounts, it should be working.<br>
+
+![Screenshot 2023-10-03 103520](https://github.com/Lachiecodes/Securing-and-Hardening-a-Linux-System/assets/138475757/e38a954b-8530-468a-a29d-31f62964f241)
+
+- There, we have successfully set specific root privileges for different user accounts.
