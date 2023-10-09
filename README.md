@@ -416,3 +416,190 @@ is intended to find it (rootkit scanners, antivirus).
 
 - We have successfully scanned and removed viruses running on the system.
 
+## Full Disk Encryption Using dm-crypt and LUKS
+- In this section, I will demonstrate how to keep your data secure by encrypting disks and partitions in Linux.
+- I’m going to encrypt an entire USB stick using dm-crypt and LUKS.
+- You can follow the same steps if you want to encrypt a hard disk partition or an external USB hard drive.
+- The following commands will destroy all data on the disk, so I encourage you to back up and migrate important files before continuing.
+- Keep in mind this is a full disk encryption solution for Linux based systems.
+- If you want to access the encrypted disk on Windows or Mac, you must install another software.
+- For example on Windows, you must install LibreCrypt to access the encrypted files.
+- The first step is to install cryptsetup if it’s not already on your system: `sudo apt install cryptsetup`.<br>
+
+![Screenshot 2023-10-10 102921](https://github.com/Lachiecodes/Securing-and-Hardening-a-Linux-System/assets/138475757/28f31803-89fc-40df-8f2f-d2856da38466)<br>
+
+- The next step is optional but recommended and consists of filling the partition you want to encrypt with random data.
+- This will ensure that the outside world will see this as random data and protect against disclosure of usage patterns.
+- Insert the USB drive and check the drive name and details using: `fdisk -l`.<br>
+
+![Screenshot 2023-10-03 172626](https://github.com/Lachiecodes/Securing-and-Hardening-a-Linux-System/assets/138475757/1fc756f4-b939-4128-b36d-84b4ffe9c41a)<br>
+
+- If you want to encrypt only a partition and not the entire disk, use that partitions name.
+- The following command will remove all data on the disk or partition you are encrypting: `dd if=/dev/urandom of=/dev/DRIVE status=progress`.<br>
+
+![Screenshot 2023-10-03 173524](https://github.com/Lachiecodes/Securing-and-Hardening-a-Linux-System/assets/138475757/92eea9e6-bc5d-48bf-92ad-543dad60d746)<br>
+
+- The next step will initialise the LUKS partition and set the initial passphrase.
+- The command will fail if the partition is already mounted, so unmount it if that’s the case: `cryptsetup -y -v luksFormat /dev/DRIVE`.<br>
+
+![Screenshot 2023-10-03 173706](https://github.com/Lachiecodes/Securing-and-Hardening-a-Linux-System/assets/138475757/aaecd841-a5e9-4543-aa3e-0fc149abfc97)<br>
+
+- After verifying the passphrase it displays command successful.
+- The next step is to open the encrypted device and setup a mapping name after successful verification of the supplied passphrase: `cryptsetup luksOpen /dev/DRIVE secretdata`.<br>
+
+![Screenshot 2023-10-03 173819](https://github.com/Lachiecodes/Securing-and-Hardening-a-Linux-System/assets/138475757/a81de392-957b-4702-9525-5a9fdd1642de)<br>
+
+- The command has created a mapping between the disk and the special device file called secretdata in `/dev/mapper`.
+- To format the file system, run the command: `mkfs.ext4 /dev/mapper/secretdata`.
+- EXT4 is the most commonly used file system for Linux.<br>
+
+![Screenshot 2023-10-03 174130](https://github.com/Lachiecodes/Securing-and-Hardening-a-Linux-System/assets/138475757/a6cc1886-a647-40da-95ab-b7bde3eed376)<br>
+
+- Finally, we mount the encrypted file system to the main file tree: `mount dev/mapper/secretdata /mnt`.<br>
+
+![Screenshot 2023-10-10 103943](https://github.com/Lachiecodes/Securing-and-Hardening-a-Linux-System/assets/138475757/f9857177-6d23-4b29-abe7-8cd2593ec7a1)<br>
+
+- At this point, you can use the mounted disk normally. You can copy move or erase files on the disk as per usual.
+- The contents of the disk will be in `/mnt`.
+- You can also create a new directory, and mount the encrypted disk to that directory: run `mkdir /root/secretdata` and then `mount /dev/mapper/secretdata /root/secretdata`.<br>
+
+![Screenshot 2023-10-10 103905](https://github.com/Lachiecodes/Securing-and-Hardening-a-Linux-System/assets/138475757/ce0512c9-49a3-4c57-bc20-b693eea00638)<br>
+
+- I can now access the disk from both `/mnt` and `/root/secretdata`.<br>
+
+![Screenshot 2023-10-03 174810](https://github.com/Lachiecodes/Securing-and-Hardening-a-Linux-System/assets/138475757/4da5e7e9-ac0a-4445-b973-f9df4c5a0c9c)<br>
+
+- Data is protected at rest, and when the disk is not mounted. To unmount the disk, run: `umount /mnt` and `umount /root/secretdata`.<br>
+
+![Screenshot 2023-10-03 175029](https://github.com/Lachiecodes/Securing-and-Hardening-a-Linux-System/assets/138475757/908d381c-5fa6-433e-8021-a90ba59eb3bb)<br>
+
+- After unmounting the directory, we must also close the LUKS volume: `cryptsetup luksClose secretdata`.<br>
+
+![Screenshot 2023-10-03 175126](https://github.com/Lachiecodes/Securing-and-Hardening-a-Linux-System/assets/138475757/9026f089-8f3d-4210-90a4-7b6859356020)<br>
+
+- To make LUKS more secure, we can also a secret key authentication method for unlocking our encrypted drive.
+- We are going to use the `dd` command and dev/urandom to generate a secret key: `dd if=/dev/urandom of=/root/keyfile bs=1024 count=4`.<br>
+
+![Screenshot 2023-10-03 175247](https://github.com/Lachiecodes/Securing-and-Hardening-a-Linux-System/assets/138475757/95025d5d-1609-4c9e-bb2e-1d4d4f8754ac)
+
+- To take a look at our random keyfile, run: `cat /root/keyfile`.<br>
+
+![Screenshot 2023-10-03 175324](https://github.com/Lachiecodes/Securing-and-Hardening-a-Linux-System/assets/138475757/8a3c5a16-1810-464e-a886-4e8c8a7d50ff)<br>
+
+- We will make the keyfile only readable by root. If a hacker managers to get root access then you have a bigger problem anyway: `chmod 400 /root/keyfile`.
+- To confirm the permission run: `ls -l /root/keyfile`.<br>
+
+![Screenshot 2023-10-03 175525](https://github.com/Lachiecodes/Securing-and-Hardening-a-Linux-System/assets/138475757/c3199104-4048-4eca-a5ed-8879fc5ce7c3)<br>
+
+- We have a USB disk that is already setup and we are going to add the keyfile as an additional authorisation method: `cryptsetup luksAddKey /dev/DRIVE /root/keyfile` .
+- Now, to unlock your drive using the keyfile, run: `cryptsetup luksOpen /dev/DRIVE secretdata --key-file /root/keyfile`.<br>
+
+![Screenshot 2023-10-03 175801](https://github.com/Lachiecodes/Securing-and-Hardening-a-Linux-System/assets/138475757/3f63b6ca-2d26-46cc-bedc-b52cfb6218af)<br>
+
+# Symmetric Encryption Using GnuPG
+
+- In this section we will encrypt a file using GPG.
+- There are two types of encryption: symmetric (private key encryption) and asymmetric (public key encryption).
+- The two most commonly used encryption methods are AES for symmetric encryption, and RSA or ECSDA for asymmetric encryption.
+- Once a file is encrypted, it can be decrypted by anyone who has the password or passphrase.
+- This can be useful for encrypting your own files locally or for encrypting a file before sending it to someone else.
+- If you choose to send the encrypted file to someone else over an insecure channel like the internet, you’ll have to make sure you send the passphrase via a more secure method.
+- There are two formats of output you can get, binary and text. The binary version will take up less space, but the text version is usually preferrable when you want to use it as text E.g. copy and pasting it into an email.
+- For our example, lets first create a simple text file and write a secret message (”This is very secret information in a sensitive file”): `nano secret.txt`.<br>
+
+![Screenshot 2023-10-04 155040](https://github.com/Lachiecodes/Securing-and-Hardening-a-Linux-System/assets/138475757/98f81a66-416c-49ca-946a-d9793ca2a09c)<br>
+
+- To encrypt the file, run the command: `gpg -c secret.txt` .<br>
+- It will prompt you for a passphrase, make sure you make this complex, at least 12-14 character with numbers and special characters included.
+
+![Screenshot 2023-10-04 155135](https://github.com/Lachiecodes/Securing-and-Hardening-a-Linux-System/assets/138475757/ab002012-cd03-4d13-bcd5-8d6b1317a4de)<br>
+
+- In the same directory, a new file will have appeared called `secret.txt.gpg`. This is the encrypted file in binary form. Check the contents using: `cat secret.txt.gpg`<br>
+
+![Screenshot 2023-10-04 155215](https://github.com/Lachiecodes/Securing-and-Hardening-a-Linux-System/assets/138475757/042e8771-5280-4abf-9d46-93e481e43254)
+![Screenshot 2023-10-04 155322](https://github.com/Lachiecodes/Securing-and-Hardening-a-Linux-System/assets/138475757/6e010fb6-7b93-4b7e-a667-3ae668bbd5e0)<br>
+
+- By default, GPG uses AES-256 as the encryption algorithm. This is very secure, but if you want to change this for an reason you can use the `--cipher-algo` option. You can also specify the name of the output file with the `-o` option: `gpg -c --cipher-algo blowfish -o secret_blowfish.txt.gpg secret.txt`<br>
+
+![Screenshot 2023-10-04 155643](https://github.com/Lachiecodes/Securing-and-Hardening-a-Linux-System/assets/138475757/77425ab4-4561-4902-b35d-a32487c92ccc)<br>
+
+- Next, we should probably remove the clear text file, using the shred command which overwrites the file many times before deleting it. This makes it very difficult to recover the contents of the file: `shred -vu -n 100 secret.txt`.<br>
+
+![Screenshot 2023-10-04 155806](https://github.com/Lachiecodes/Securing-and-Hardening-a-Linux-System/assets/138475757/af5d2786-2ee2-4ace-b7d5-6b42e125dd04)<br>
+
+- When you want to decrypt your file, run: `gpg -o secret.txt -d secret.txt.gpg`.<br>
+
+![Screenshot 2023-10-04 155927](https://github.com/Lachiecodes/Securing-and-Hardening-a-Linux-System/assets/138475757/53ed7b0b-5121-495d-b1a5-d689b4ba1ab7)
+
+- The tool will automatically determine if it symmetrically or asymmetrically encrypted and the encryption algorithm.
+- To produce an encrypted ASCII format for text based uses of the encrypted file, use the `-a` option: `gpg -ca secret.txt`.
+- This will create a file called `secret.txt.asc`.<br>
+
+![Screenshot 2023-10-04 160043](https://github.com/Lachiecodes/Securing-and-Hardening-a-Linux-System/assets/138475757/0b2e9472-9e32-4669-b6e9-025689042f02)
+
+# Steganography
+
+- Steganography is the art of hiding secret information in plain-text or in clear-sight.
+- Steganographic tools can easily embed secret files into images, movies, audio files or other file formats.
+- The word steganography comes from the Greek word “steganos” which means “hidden” and “graph” or “graphia” which means writing.The purpose of steganography is to hide even the mere existence of the message that is being sent.
+
+**Use Cases**
+
+- Sending encrypted messages without raising suspicion, such as in countries where free speech is suppressed.
+- Digital watermark of the copyright holder.
+- Hiding or transporting secret information (secret documents, Bitcoin private key etc).
+- Transporting sensitive data from point A to point B such that the transfer of the data is unknown.
+
+**Steps**
+
+1. The secret file is encrypted.
+2. The encrypted secret file is embedded into a cover file  according to a steganographic algorithm.  The cover file that contains the secret message or the embedded file is called stego file.
+3. The stego file is sent normally (in clear-text or encrypted) to the destination or is made public to be easily reached.
+
+**How to**
+
+- First, we need to install the steganography tool, steghide: `sudo apt install steghide`.<br>
+
+![Screenshot 2023-10-06 090115](https://github.com/Lachiecodes/Securing-and-Hardening-a-Linux-System/assets/138475757/7fb47af9-61a8-47b3-a6dc-fd626b61853e)<br>
+
+- In this example, we will use an image as the cover file, and secretmessage.txt as the file to be embedded.
+- Make sure you have both files in the same directory, where you will be executing steghide.
+- First, make a copy of the image file: `cp img.jpg img_original.jpg`.<br>
+
+![Screenshot 2023-10-06 090419](https://github.com/Lachiecodes/Securing-and-Hardening-a-Linux-System/assets/138475757/cf783b25-3e10-428d-8acc-0c42c13eb00f)<br>
+
+- Let’s check the hashes of the images to confirm as a baseline that they are the same: `sha256sum img*`.<br>
+
+![Screenshot 2023-10-06 090445](https://github.com/Lachiecodes/Securing-and-Hardening-a-Linux-System/assets/138475757/f5ce81b7-779e-4345-a1b6-faa3559f3ef6)<br>
+
+- Let’s see what the capacity is of the carrier file: `steghide info img.jpg`.<br>
+
+![Screenshot 2023-10-06 090525](https://github.com/Lachiecodes/Securing-and-Hardening-a-Linux-System/assets/138475757/a61f0e72-2f90-4500-b2e7-ef7e428f8fea)<br>
+
+- Let's create an example secret message to be embedded into the the image.<br>
+
+![Screenshot 2023-10-06 090759](https://github.com/Lachiecodes/Securing-and-Hardening-a-Linux-System/assets/138475757/a6dd3805-7337-42ae-8aa4-48256ccc00cb)<br>
+
+- Now, to embed the text file into the image, run the command: `steghide embed -cf img.jpg -ef secretmessage.txt`.<br>
+
+![Screenshot 2023-10-06 090856](https://github.com/Lachiecodes/Securing-and-Hardening-a-Linux-System/assets/138475757/1a662e5e-6d1c-4e01-b865-7adcfafc0dfe)
+
+- Now, it will ask for a passphrase. Make sure you use a length of at least 12-14 characters and include numbers and special characters.
+- Take a look at both images, as you can see they look identical to the naked eye.<br>
+
+![Screenshot 2023-10-06 091326](https://github.com/Lachiecodes/Securing-and-Hardening-a-Linux-System/assets/138475757/8663dfa8-0faf-4fd5-8662-361a162b22bd)<br>
+
+- The easiest way to determine if there is a secret message hidden inside the file, would be to compare the two files using a hash algorithm.
+- Run the hash algorithm again: `sha256sum img*`. You will notice now that the hashes of the two files are different.<br>
+
+![Screenshot 2023-10-06 091420](https://github.com/Lachiecodes/Securing-and-Hardening-a-Linux-System/assets/138475757/0ff46136-0a97-4e74-911a-c5c7a23281a2)<br>
+
+- To extract the hidden embedded file, run the command: `steghide extract -sf img.jpg`.<br>
+
+![Screenshot 2023-10-06 091523](https://github.com/Lachiecodes/Securing-and-Hardening-a-Linux-System/assets/138475757/e2bbf7bc-99a2-4857-912b-049ad9832e88)<br>
+
+- In a real world steganography case, you should ALWAYS use unique images, as that way, there will be no way for the intercepted messages to be verified against the original unless someone has access to your files.
+- There is one other way to determine that a file is using stenography, called steganalysis. The problem is generally handled with statistical analysis, similiar to cryptanalysis.
+- In practice, however, it is extremely complicated to break steganography.
+
+
