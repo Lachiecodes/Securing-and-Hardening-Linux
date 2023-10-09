@@ -384,7 +384,7 @@ is intended to find it (rootkit scanners, antivirus).
 - To start the ClamAV daemon, run the command: `sudo systemctl start clamav-daemon`.
 - To enable the ClamAV to start at boot, run: `sudo systemctl enable clamav-daemon`.<br>
 
-![Screenshot 2023-10-03 162732](https://github.com/Lachiecodes/Securing-and-Hardening-a-Linux-System/assets/138475757/78a0e523-3e8b-42fb-91fc-a73c1ba034f5)<b>
+![Screenshot 2023-10-03 162732](https://github.com/Lachiecodes/Securing-and-Hardening-a-Linux-System/assets/138475757/78a0e523-3e8b-42fb-91fc-a73c1ba034f5)<br>
 
 - Once the ClamAV daemon has finished starting up, we will run a test scan.
 - First, lets download an EICAR test malware file by running: `wget www.eicar.org/download/eicar.com`.
@@ -404,8 +404,15 @@ is intended to find it (rootkit scanners, antivirus).
 
 - Now lets take a look at `clamscan`, which is a bit slower, but is more simple and uses less RAM as it does not require the ClamAV daemon.
 - First, stop the ClamAV daemon by running: `systemctl stop clamav-daemon`.
-- Then, for example, you can run a scan using: `clamscan --recursive /etc`.
+- Then, for example, you can run a scan using: `clamscan --recursive /etc`.<br>
+
+![Screenshot 2023-10-03 164440](https://github.com/Lachiecodes/Securing-and-Hardening-a-Linux-System/assets/138475757/5a5cc214-2e46-44fe-a977-eec41189e827)
+![Screenshot 2023-10-03 164503](https://github.com/Lachiecodes/Securing-and-Hardening-a-Linux-System/assets/138475757/f8c3ac37-88db-4d17-af3f-45cba10d34c2)<br>
+
 - If you want to only print out the infected files, you can include the `--infected` option.
 - Also, if you want to automatically remove infected files, use the `--remove` option.
 
+![Screenshot 2023-10-03 164701](https://github.com/Lachiecodes/Securing-and-Hardening-a-Linux-System/assets/138475757/90b22dca-797a-4c93-970e-13c6c71c8222)
+
+- We have successfully scanned and removed viruses running on the system.
 
