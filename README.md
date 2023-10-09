@@ -16,7 +16,7 @@ In this project I demonstrate a number of different ways in which you can config
 - Eliminate unused and well-known accounts that are not needed.
 - Give users limited administrative access.
 - Do not use the root account on a regular basis and do not allow direct root login.
-- Set limits using the `ulimit` command to avoid DoS attacks such as launching a fork bomb.
+- Set limits using the ulimit command to avoid DoS attacks such as launching a fork bomb.
 - Implement File Monitoring (Host IDS - AIDE).
 - Scan for Rootkits, Viruses and Malware (Rootkit Hunter, chkrootkit, ClamAV).
 - Use Disk Encryption to protect your data. Don’t forget to encrypt your backups aswell.
