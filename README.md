@@ -44,7 +44,7 @@ In this project I demonstrate a number of different ways in which you can config
 
 ![Screenshot 2023-09-28 220335](https://github.com/Lachiecodes/Securing-and-Hardening-a-Linux-System/assets/138475757/de7da639-1bcc-4ec3-92b4-7df6c562671d)<br>
 
-- You can also restrict SSH access to only allow connections from certain IP addresses using `iptables` to specify the address: `iptables -A INPUT -p tcp —dport 2278 -s x.x.x.x -j ACCEPT` and drop all other incoming connections:`iptables -A INPUT -p tcp —dport 2278 -j DROP`.<br>
+- You can also restrict SSH access to only allow connections from certain IP addresses using `iptables` to specify the address: `iptables -A INPUT -p tcp --dport 2278 -s x.x.x.x -j ACCEPT` and drop all other incoming connections:`iptables -A INPUT -p tcp --dport 2278 -j DROP`.<br>
 
 ![Screenshot 2023-09-28 220156](https://github.com/Lachiecodes/Securing-and-Hardening-a-Linux-System/assets/138475757/bbb49f06-7f09-43a1-bb93-a11ec15c3560)
 
@@ -149,7 +149,7 @@ In this project I demonstrate a number of different ways in which you can config
 
 ![Screenshot 2023-10-03 091451](https://github.com/Lachiecodes/Securing-and-Hardening-a-Linux-System/assets/138475757/3fe3046f-03eb-4e0e-be90-4ea23d96e566)<br>
 
-- To verify if the account is locked or disabled run the command: `sudo passwd —status user`. If you see a capital L it means its locked, NP means there is no password, and P means there is a valid password.
+- To verify if the account is locked or disabled run the command: `sudo passwd --status user`. If you see a capital L it means its locked, NP means there is no password, and P means there is a valid password.
 - You can also check the hash of the password using: `sudo cat /etc/shadow`. The password will have an ! at the front of it, which is not a valid file hash.<br>
 
 ![Screenshot 2023-10-03 091523](https://github.com/Lachiecodes/Securing-and-Hardening-a-Linux-System/assets/138475757/c971557d-6df3-4070-9Givi9f2-b57316316925)<br>
@@ -158,12 +158,12 @@ In this project I demonstrate a number of different ways in which you can config
 
 ![Screenshot 2023-10-03 091919](https://github.com/Lachiecodes/Securing-and-Hardening-a-Linux-System/assets/138475757/0eaad4c1-6cf0-497d-ae55-c52e7f3b20d6)<br>
 
-- To completely disable an account use the command: `sudo usermod —expiredate 1 user`. This sets the users account expiry date to 1 day after the Unix epoch, which is 00:00:00 UTC on 1 January 1 1970.
+- To completely disable an account use the command: `sudo usermod --expiredate 1 user`. This sets the users account expiry date to 1 day after the Unix epoch, which is 00:00:00 UTC on 1 January 1 1970.
 - To check the expiration date run: `sudo chage -l user` and you should see the expiration date as the 02 January 1970.<br>
 
 ![Screenshot 2023-10-03 092218](https://github.com/Lachiecodes/Securing-and-Hardening-a-Linux-System/assets/138475757/d0566ddf-cbb3-4f8a-b81e-f5c1277c8725)<br>
 
-- To reenable the account, you can use the command: `sudo usermod —expiredate "" user`.<br>
+- To reenable the account, you can use the command: `sudo usermod --expiredate "" user`.<br>
 
 ![Screenshot 2023-10-03 092329](https://github.com/Lachiecodes/Securing-and-Hardening-a-Linux-System/assets/138475757/4446984d-3349-4a8b-b677-9e6183b99c46)
 
@@ -183,7 +183,7 @@ In this project I demonstrate a number of different ways in which you can config
 - We can give limited privilege access to users or groups and configure per command privilege access by editing the sudoers configuration file located at `/etc/sudoers`.
 - Due to it being possible to break the system with improper syntax when editing this file, it is not recommended to edit the file directly with a normal text editor.
 - Always use the visudo command instead, as it validates the syntax of the file before saving to ensure.
-- By default, the command uses Vim as the text editor, but you can configure it using the command: `sudo update-alternatives —config editor`. I prefer to use nano.<br>
+- By default, the command uses Vim as the text editor, but you can configure it using the command: `sudo update-alternatives --config editor`. I prefer to use nano.<br>
 
 ![Screenshot 2023-10-03 122115](https://github.com/Lachiecodes/Securing-and-Hardening-a-Linux-System/assets/138475757/1739844c-d5e4-4080-98ff-9fe3f9657d96)<br>
 
@@ -220,3 +220,192 @@ In this project I demonstrate a number of different ways in which you can config
 ![Screenshot 2023-10-03 103520](https://github.com/Lachiecodes/Securing-and-Hardening-a-Linux-System/assets/138475757/e38a954b-8530-468a-a29d-31f62964f241)
 
 - There, we have successfully set specific root privileges for different user accounts.
+
+## Setting Users’ Limits (Running a DoS Attack Without root Access)
+- There is an interesting denial of service attack called a ‘Fork Bomb’ or ‘Rabbit Virus’ which can be used to bring down an entire Linux system as an unprivileged user.
+- Please don’t test this on a production system because it will make it unusable. If you want to test it out, run it on a VM.
+- Create a bash script using the command:
+`nano bomb`
+- Inside the script, add the single line of code: `$0 && $0 &`.<br>
+
+![Screenshot 2023-10-03 122523](https://github.com/Lachiecodes/Securing-and-Hardening-a-Linux-System/assets/138475757/b4e59ad2-7a66-43e8-9dd1-592dd4e996df)<br>
+
+- Save the file, and edit the file permissions: `chmod +x bomb`.<br>
+
+![Screenshot 2023-10-03 122804](https://github.com/Lachiecodes/Securing-and-Hardening-a-Linux-System/assets/138475757/27974140-8155-4a4d-b695-ee4a5169e792)<br>
+
+- Now run the script, and the system will crash: `./bomb`.
+- The only way to get out of this is to power cycle the machine.
+- The script is very simple DoS attack which makes use of the fork system call to create an infinite number of processes.
+- `$0` is a special variable which represents the script itself. So the script is running itself recursively two times and then is going in the background for another recursive call. `&` at the end puts the process in the background so new child processes cannot die and they start eating the system resources.
+- To protect the system from this sort of attack, we need to set a limit on the number of process a user can run.
+- Using `ulimit -u` we can see the currently allowed number of processes allowed for the current user.<br>
+
+![Screenshot 2023-10-03 125100](https://github.com/Lachiecodes/Securing-and-Hardening-a-Linux-System/assets/138475757/c45d97bf-4dc9-4dcb-ba74-f21d1b1ae810)<br>
+
+- We can set the number of processes using the command: `sudo nano /etc/security/limits.conf`.
+- At the end of the file, add the line: `user1 hard nproc 2000`.
+- This will limit the user processes to 2000. Don’t make this too low otherwise the user will not be able to work properly on the system.
+- You can also add a limit to a group by adding the line: `@group hard nproc 4000`<br>
+
+![Screenshot 2023-10-03 131700](https://github.com/Lachiecodes/Securing-and-Hardening-a-Linux-System/assets/138475757/ebe3adb1-9701-467c-b522-bc3c4a1ab0e2)
+
+- Now, log out and in again and try to run the ./bomb script again. As you can see, the system is still usable and did not crash.
+- Use the `ulimit -u` command you can also double check to confirm that your changes in /etc/security/limits.conf have worked.<br>
+
+![Screenshot 2023-10-03 131922](https://github.com/Lachiecodes/Securing-and-Hardening-a-Linux-System/assets/138475757/81242c69-03db-4b45-843c-684f8ca412df)<br>
+
+- We have successfully mitigated the Fork Bomb attack on Linux and made the system more secure.
+
+## Checking File Integrity with AIDE
+- One possible layer of security that may be applied to your Linux server is file integrity monitoring or file integrity verification.
+- The purpose of monitoring and verifying the integrity of the important files including system binaries and configuration files is to make sure that the files have not been altered by unauthorised means.
+- The unauthorised alteration of certain system files is one of the symptoms of an active attack or a compromised system.
+- Once a hacker compromises a system they will start to modify configuration files, binaries and so on to consolidate his position and make it possible to return whenever they want.
+- For example the `ls` and `ps` commands are often altered by rootkits so they don’t show files or processes belonging to the rootkit.
+- There are a number of solutions used to monitor the integrity of critical system files, one of those being AIDE.
+- AIDE (Advanced Intrusion Detection Environment) is a file integrity and monitoring or file integrity verification tool. It is a host-based IDS (HIDS).
+- AIDE works by taking a snapshot of the state of the system. Saving hashes, modification times, inode number, user group, file size and other data regarding the files defined by the administrator in the configuration files. This snapshot will be used to build a database.
+- When you run an integrity test, AIDE will compare the database against the real status of the system. If there are any chances between the existing snapshot and the test, AIDE will detect it and report it to you.
+- To install AIDE, run the command: `sudo apt update && apt install aide`.
+- Once installed, you can check the version and compiled options using: `aide -v`.
+- To open and edit the configuration file, run the command: `nano /etc/aide/aide.conf`. Here you can configure scanning and reporting rules, and where the database is located.
+- Files and directories can change in many ways. Some you may not consider important but others you’ll want to be reported.
+- This configuration file determines whether and how should report a file or directory as having changed and which attributes AIDE should consider when scanning.
+- The next step is to initialise the AIDE database by running the command: `sudo aideinit`.
+- By default, `aidinit` checks a set of directories and files defined in `/etc/aide/aide.conf` and creates the baseline database.
+- We can check the newly created database by running: `ls -l /var/lib/aide`. It will be named `aide.db.new`.
+- After initialising the database you will need to move the newly created database to the one that it will be check against and its by default `aide.db`. Run the command: `mv /var/lib/aide/aide.db.new /var/lib/aide/aide.db`.
+- Now run a few commands to make some changes to your system. Such as: `sudo touch /root/abc.txt` and `sudo useradd user3`.
+- Now lets test to see if AIDE is working. Run the command: `sudo aide -c /var/lib/aide/aide.conf.autogenerated --check > system-report.txt`.
+- Now wait for it to complete, and open the file to check any changes to the system: `less system-report.txt`.
+- If after reviewing the changes and determining they are ok, it is recommended to update the AIDE database with the new changes so they are not reported again on the next AIDE check.
+- You can update the database with the following command: `aide -c /var/lib/aide/aide.conf.autogenerated --update`.
+- Next, copy the newly created database as the baseline database: `cp /var/lib/aide/aide.db.new /var/lib/aide/aide.db`.
+- Now run the check command again: `sudo aide -c /var/lib/aide/aide.conf.autogenerated --check > system-report.txt`.
+- This time, AIDE should not report the changes you made earlier since the database files have been updated.
+- You can also create your own AIDE configuration file to keep things simple.
+- You can also automate AIDE using a cronjob and configure it to send you email reports with the changes every day.
+
+## Scanning for Rootkits (rkhunter and chkrootkit)
+- A rootkit is a collection of malicious computer software designed to enable access to a
+computer that is not otherwise allowed.
+- A rootkit contains malware that can steal data and take over a system for malicious purposes all while remaining undetected.
+- Typically, a hacker installs the rootkit after having obtained privileged access to the system.
+- Obtaining this access is a result of a direct attack on the system such as exploiting a known vulnerability or getting a valid password obtained by cracking or social engineering tactics such as fishing.
+- After a successful intrusion into a system, usually the intruder will install a so-called
+"rootkit" to secure further access.
+- Once a rootkit is installed, it becomes possibly to hide the intrusion as well as to maintain privileged access.
+- A rootkit can hide a keylogger capturing your keystrokes and sending your confidential information to the hacker who controls it.
+- It can also allow hackers to use your computer for illicit activities such as launching DoS attacks against other computers or sending out spam.
+- Rootkit detection is difficult because a rootkit may be able to subvert the software that
+is intended to find it (rootkit scanners, antivirus).
+- Rootkits could remain in place for a very long time because their role is to hide any trail of their existence.
+- Due to this, finding rootkits is a challenge especially if its loads kernel modules and compromises the kernel.
+- By modifying kernel system calls, kernel rootkits can hide files, directories, processes or network connections without modifying any system binaries.
+- If you find out that a system was compromised by a rootkit and you find out about it by any means, you MUST reinstall the entire system.
+- NEVER TRUST A COMPROMISED MACHINE. EVER.
+- To find rootkits on a Linux system we will use two tools: rkhunter and chkrootkit.
+- It’s recommended to run these tools from a rescue disk, typically a live one. Or optionally, you can use an alternate directory from which to run all of the commands. This allows the rootkit scanner to use commands which have not been potentially compromised.
+
+**Rkhunter**
+- Rootkit Hunter is a security monitoring tool for Linux which scans for rootkits and other possible vulnerabilities.
+- It does so by searching for the default directories of rootkits, misconfigured permissions. hidden files, kernel modules containing suspicious strings and comparing hashes of important files with known good ones.
+- It is written in Bash so it’s portable and can be running on any Linux based systems.
+- To install rkhunter from the official Ubuntu repository, run: `sudo apt update && apt install rkhunter`.<br>
+
+![Screenshot 2023-10-03 154700](https://github.com/Lachiecodes/Securing-and-Hardening-a-Linux-System/assets/138475757/9535a4b6-6cc4-44ae-90a6-1be478a15ce3)<br>
+
+- After installing rkhunter and prior to running it, you’ll need to update the file properties database: `sudo rkhunter --propupd`.<br>
+
+![Screenshot 2023-10-03 154756](https://github.com/Lachiecodes/Securing-and-Hardening-a-Linux-System/assets/138475757/f23464b0-c364-46be-81c6-a695a603147b)<br>
+
+- To run a system check, use the command: `sudo rkhunter --check`.<br>
+
+![Screenshot 2023-10-03 154932](https://github.com/Lachiecodes/Securing-and-Hardening-a-Linux-System/assets/138475757/2f336ada-5a68-4679-a1f8-95fe5ac29a0c)
+
+- The results of the scan will be displayed in the terminal, and if anything suspicious is found, then a warning will be displayed.
+- A log file of the test while be automatically created in `/var/log/`.
+- You can also run a check which only displays the warnings with the command: `sudo rkhunter --check --report-warnings-only`.<br>
+
+![Screenshot 2023-10-03 155125](https://github.com/Lachiecodes/Securing-and-Hardening-a-Linux-System/assets/138475757/8782404e-2a3d-4d80-9bad-2960cbf1c116)
+
+- Out of the box, rkhunter will throw up some false warnings during the file property checks. This is because a few of the core utilities have been replaced by different scripts.
+- For example, on this Ubuntu VM, rkhunter reports a warning for `usr/bin/lwp-request`. I know this is a false positive because I have just installed the system from a trustworthy source.<br>
+
+![Screenshot 2023-10-03 154946](https://github.com/Lachiecodes/Securing-and-Hardening-a-Linux-System/assets/138475757/c8880951-542d-4d08-9918-b50ddc6d8142)
+
+- These false positives can be ignored by whitelisting them in the rkthunter config file: `nano /etc/rkhunter.conf`.
+- Add the line: `SCRIPTWHITELIST=/usr/bin/lwp-request`<br>
+  
+![Screenshot 2023-10-03 155447](https://github.com/Lachiecodes/Securing-and-Hardening-a-Linux-System/assets/138475757/0745d6b7-eb8d-4848-b700-336490d1427f)
+
+**Chkrootkit**
+- Check Rootkit is another tool which locally checks for rootkits.
+- Install it by running: `sudo apt install chkrootkit`.<br>
+
+![Screenshot 2023-10-03 155727](https://github.com/Lachiecodes/Securing-and-Hardening-a-Linux-System/assets/138475757/de52099c-0900-447c-b0c7-f5fd60eb10ed)<br>
+
+- To start a scan, simply run as root: `sudo chkrootkit`.<br>
+
+![Screenshot 2023-10-03 160058](https://github.com/Lachiecodes/Securing-and-Hardening-a-Linux-System/assets/138475757/38ae69e4-99e7-4090-953e-8997f9167ddb)<br>
+
+- Note that a warning doesn’t necessarily mean that the system was compromised, it’s just a red flag that needs to be further investigated.
+- The first thing you should do is search on google for chkrootkit and the warning it has displayed.
+- We can also run it in quiet mode by running the `-q` option and it will print out only the warnings if there are any: `sudo chkrootkit -q`.
+- It’s recommended to frequently run a cronjob that scans for rootkits.
+
+# Scanning for Viruses with ClamAV
+- If you run and use only Linux, an antivirus program is not generally necessary.
+- Even though Linux is known as being mostly virus free, there are cases when installing an antivirus program and running scans is necessary.
+- If you are running a Linux based file server such as an FTP server or mail server, you’ll probably want to use an antivirus software.
+- If you don’t, infected Windows computer may upload infected files to your Linux machine, allowing it to infect other Windows systems.
+- The antivirus will actually scan for Windows malware and delete it. It isn’t protecting your Linux system, its protecting the Windows computers from themselves.
+- ClamAV is the most popular open source and free antivirus scanner available for Linux, Windows and Mac OS.
+- ClamAV can quarantine or delete infected archived files, emails, websites and more.
+- It has been around for a while and most commonly used in an integrated fashion with mail servers for email scanning.
+- To install, run the command: `sudo apt install && apt install clamav clamav-daemon`.<br>
+
+![Screenshot 2023-10-03 162342](https://github.com/Lachiecodes/Securing-and-Hardening-a-Linux-System/assets/138475757/fc02cd6a-6061-4ebc-8f45-7e13c3dc247d)
+
+- Lets take a look at the most important components of ClamAV, using: `man clamd`.
+- The ClamAV daemon (clamd) loads the virus database definitions into memory and handles scanning of files when instructed to do so by clients such as `clamdscan`.
+- The `clamdscan` utility allows you to scan the file system and asks `clamd` to scan a given set of files.
+- There is also `clamscan`. The difference between `clamdscan` and `clamscam`, is that `clamscan` loads its own virus database and does the processing itself whereas `clamdscan` is a thin client for the clamd daemon which keeps its virus database in memory ready to use.
+- In order to use `clamdscan`, you have to have `clamd` running.
+- Using `clamdscan` is faster, but the memory consumption of `clamd` is quite high, around 1gb of RAM.
+- The last component is the `freshclam` daemon. This is a tool that periodically checks for virus database definition updates, downloads and installs them, and notifies clamd to refresh its in memory virus database cache.
+- After installing the ClamAV packages, we’ll have two services installed: clamav-freshclam and clamav-daemon.
+- The status of the services can be checked by running: `sudo systemctl status clamav-freshclam` and `sudo systemctl status clamav-daemon`.<br>
+
+![Screenshot 2023-10-03 162659](https://github.com/Lachiecodes/Securing-and-Hardening-a-Linux-System/assets/138475757/cdc69dcd-883d-4de5-841c-e7681149c88d)<br>
+
+- By default clamav-freshclam will be running and clamav-daemon will be disabled.
+- To start the ClamAV daemon, run the command: `sudo systemctl start clamav-daemon`.
+- To enable the ClamAV to start at boot, run: `sudo systemctl enable clamav-daemon`.<br>
+
+![Screenshot 2023-10-03 162732](https://github.com/Lachiecodes/Securing-and-Hardening-a-Linux-System/assets/138475757/78a0e523-3e8b-42fb-91fc-a73c1ba034f5)<b>
+
+- Once the ClamAV daemon has finished starting up, we will run a test scan.
+- First, lets download an EICAR test malware file by running: `wget www.eicar.org/download/eicar.com`.
+- Now, run: `clamdscan --fdpass`.<br>
+
+![Screenshot 2023-10-03 164046](https://github.com/Lachiecodes/Securing-and-Hardening-a-Linux-System/assets/138475757/f8343e67-417b-4b45-a68e-a82c7b7e3461)<br>
+
+- If you want to quarantine infected files, pass the `--move` option, which moves the files to a specific directory.
+- Create your quarantine directory by running: `mkdir /quarantine`.<br>
+
+![Screenshot 2023-10-03 164139](https://github.com/Lachiecodes/Securing-and-Hardening-a-Linux-System/assets/138475757/71b9b186-0b3f-4edf-b18b-9c20124e85a7)<br>
+
+- Now you can the the command: `clamdscan --move=/quarantine --fdpass /root`.<br>
+
+![Screenshot 2023-10-03 164247](https://github.com/Lachiecodes/Securing-and-Hardening-a-Linux-System/assets/138475757/e0c9e2a7-c630-47e0-9782-78eb8307dd98)<br>
+![Screenshot 2023-10-03 164312](https://github.com/Lachiecodes/Securing-and-Hardening-a-Linux-System/assets/138475757/96c75dad-7868-4caf-b24a-a74a6141be0f)<br>
+
+- Now lets take a look at `clamscan`, which is a bit slower, but is more simple and uses less RAM as it does not require the ClamAV daemon.
+- First, stop the ClamAV daemon by running: `systemctl stop clamav-daemon`.
+- Then, for example, you can run a scan using: `clamscan --recursive /etc`.
+- If you want to only print out the infected files, you can include the `--infected` option.
+- Also, if you want to automatically remove infected files, use the `--remove` option.
+
+
