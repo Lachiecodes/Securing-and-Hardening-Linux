@@ -290,28 +290,28 @@ In this project I demonstrate a number of different ways in which you can config
 ## Scanning for Rootkits (rkhunter and chkrootkit)
 - A rootkit is a collection of malicious computer software designed to enable access to a
 computer that is not otherwise allowed.
-- A rootkit contains malware that can steal data and take over a system for malicious purposes all while remaining undetected.
+- A rootkit contains malware that can steal data and take over a system for malicious purposes, all while remaining undetected.
 - Typically, a hacker installs the rootkit after having obtained privileged access to the system.
-- Obtaining this access is a result of a direct attack on the system such as exploiting a known vulnerability or getting a valid password obtained by cracking or social engineering tactics such as fishing.
+- Obtaining this access is a result of a direct attack on the system, such as exploiting a known vulnerability or getting a valid password obtained by cracking or social engineering tactics such as phishing.
 - After a successful intrusion into a system, usually the intruder will install a so-called
 "rootkit" to secure further access.
-- Once a rootkit is installed, it becomes possibly to hide the intrusion as well as to maintain privileged access.
+- Once a rootkit is installed, it becomes possible to hide the intrusion as well as to maintain privileged access.
 - A rootkit can hide a keylogger capturing your keystrokes and sending your confidential information to the hacker who controls it.
 - It can also allow hackers to use your computer for illicit activities such as launching DoS attacks against other computers or sending out spam.
 - Rootkit detection is difficult because a rootkit may be able to subvert the software that
-is intended to find it (rootkit scanners, antivirus).
+is intended to find it, such as rootkit scanners and antivirus.
 - Rootkits could remain in place for a very long time because their role is to hide any trail of their existence.
-- Due to this, finding rootkits is a challenge especially if its loads kernel modules and compromises the kernel.
+- Due to this, finding rootkits is a challenge especially if it loads kernel modules and compromises the kernel.
 - By modifying kernel system calls, kernel rootkits can hide files, directories, processes or network connections without modifying any system binaries.
-- If you find out that a system was compromised by a rootkit and you find out about it by any means, you MUST reinstall the entire system.
+- If you discover that a system was compromised by a rootkit through any means, you MUST reinstall the entire system.
 - NEVER TRUST A COMPROMISED MACHINE. EVER.
 - To find rootkits on a Linux system we will use two tools: rkhunter and chkrootkit.
 - It’s recommended to run these tools from a rescue disk, typically a live one. Or optionally, you can use an alternate directory from which to run all of the commands. This allows the rootkit scanner to use commands which have not been potentially compromised.
 
 **Rkhunter**
 - Rootkit Hunter is a security monitoring tool for Linux which scans for rootkits and other possible vulnerabilities.
-- It does so by searching for the default directories of rootkits, misconfigured permissions. hidden files, kernel modules containing suspicious strings and comparing hashes of important files with known good ones.
-- It is written in Bash so it’s portable and can be running on any Linux based systems.
+- It does so by searching for the default directories of rootkits, misconfigured permissions. hidden files, kernel modules containing suspicious strings, and comparing hashes of important files with known good ones.
+- It is written in Bash so it’s portable and can be run on any Linux based systems.
 - To install rkhunter from the official Ubuntu repository, run: `sudo apt update && apt install rkhunter`.<br>
 
 ![Screenshot 2023-10-03 154700](https://github.com/Lachiecodes/Securing-and-Hardening-a-Linux-System/assets/138475757/9535a4b6-6cc4-44ae-90a6-1be478a15ce3)<br>
@@ -356,14 +356,14 @@ is intended to find it (rootkit scanners, antivirus).
 - It’s recommended to frequently run a cronjob that scans for rootkits.
 
 # Scanning for Viruses with ClamAV
-- If you run and use only Linux, an antivirus program is not generally necessary.
+- If you run and use only Linux, an antivirus program is generally not necessary.
 - Even though Linux is known as being mostly virus free, there are cases when installing an antivirus program and running scans is necessary.
-- If you are running a Linux based file server such as an FTP server or mail server, you’ll probably want to use an antivirus software.
+- If you are running a Linux-based file server such as an FTP server or mail server, you’ll probably want to use an antivirus software.
 - If you don’t, infected Windows computer may upload infected files to your Linux machine, allowing it to infect other Windows systems.
 - The antivirus will actually scan for Windows malware and delete it. It isn’t protecting your Linux system, its protecting the Windows computers from themselves.
-- ClamAV is the most popular open source and free antivirus scanner available for Linux, Windows and Mac OS.
+- ClamAV is the most popular open-source and free antivirus scanner available for Linux, Windows and Mac OS.
 - ClamAV can quarantine or delete infected archived files, emails, websites and more.
-- It has been around for a while and most commonly used in an integrated fashion with mail servers for email scanning.
+- It has been around for a while and is most commonly used in an integrated fashion with mail servers for email scanning.
 - To install, run the command: `sudo apt install && apt install clamav clamav-daemon`.<br>
 
 ![Screenshot 2023-10-03 162342](https://github.com/Lachiecodes/Securing-and-Hardening-a-Linux-System/assets/138475757/fc02cd6a-6061-4ebc-8f45-7e13c3dc247d)
@@ -421,7 +421,7 @@ is intended to find it (rootkit scanners, antivirus).
 - I’m going to encrypt an entire USB stick using dm-crypt and LUKS.
 - You can follow the same steps if you want to encrypt a hard disk partition or an external USB hard drive.
 - The following commands will destroy all data on the disk, so I encourage you to back up and migrate important files before continuing.
-- Keep in mind this is a full disk encryption solution for Linux based systems.
+- Keep in mind this is a full disk encryption solution for Linux-based systems.
 - If you want to access the encrypted disk on Windows or Mac, you must install another software.
 - For example on Windows, you must install LibreCrypt to access the encrypted files.
 - The first step is to install cryptsetup if it’s not already on your system: `sudo apt install cryptsetup`.<br>
@@ -461,7 +461,7 @@ is intended to find it (rootkit scanners, antivirus).
 
 - At this point, you can use the mounted disk normally. You can copy move or erase files on the disk as per usual.
 - The contents of the disk will be in `/mnt`.
-- You can also create a new directory, and mount the encrypted disk to that directory: run `mkdir /root/secretdata` and then `mount /dev/mapper/secretdata /root/secretdata`.<br>
+- You can also create a new directory and mount the encrypted disk to that directory: run `mkdir /root/secretdata` and then `mount /dev/mapper/secretdata /root/secretdata`.<br>
 
 ![Screenshot 2023-10-10 103905](https://github.com/Lachiecodes/Securing-and-Hardening-a-Linux-System/assets/138475757/ce0512c9-49a3-4c57-bc20-b693eea00638)<br>
 
@@ -491,7 +491,7 @@ is intended to find it (rootkit scanners, antivirus).
 
 ![Screenshot 2023-10-03 175525](https://github.com/Lachiecodes/Securing-and-Hardening-a-Linux-System/assets/138475757/c3199104-4048-4eca-a5ed-8879fc5ce7c3)<br>
 
-- We have a USB disk that is already setup and we are going to add the keyfile as an additional authorisation method: `cryptsetup luksAddKey /dev/DRIVE /root/keyfile` .
+- We have a USB disk that is already set up, and we are going to add the keyfile as an additional authorisation method: `cryptsetup luksAddKey /dev/DRIVE /root/keyfile` .
 - Now, to unlock your drive using the keyfile, run: `cryptsetup luksOpen /dev/DRIVE secretdata --key-file /root/keyfile`.<br>
 
 ![Screenshot 2023-10-03 175801](https://github.com/Lachiecodes/Securing-and-Hardening-a-Linux-System/assets/138475757/3f63b6ca-2d26-46cc-bedc-b52cfb6218af)<br>
