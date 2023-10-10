@@ -152,7 +152,8 @@ In this project I demonstrate a number of different ways in which you can config
 - To verify if the account is locked or disabled run the command: `sudo passwd --status user`. If you see a capital L it means its locked, NP means there is no password, and P means there is a valid password.
 - You can also check the hash of the password using: `sudo cat /etc/shadow`. The password will have an ! at the front of it, which is not a valid file hash.<br>
 
-![Screenshot 2023-10-03 091523](https://github.com/Lachiecodes/Securing-and-Hardening-a-Linux-System/assets/138475757/c971557d-6df3-4070-9Givi9f2-b57316316925)<br>
+![Screenshot 2023-10-03 091523](https://github.com/Lachiecodes/Securing-and-Hardening-a-Linux-System/assets/138475757/9894fc78-e458-4ca6-9e48-714c1b2a4ce2)<br>
+
 
 - To unlock the user user account, use the command: `sudo passwd -u user`.<br>
 
