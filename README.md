@@ -4,7 +4,7 @@
 
 
 ## Introduction
-In this project I demonstrate a number of different ways in which you can configure settings in Linux Ubuntu to increase the security of the operating system. Although Linux is relatively secure and virus free out of the box, if you want enterprise level security for business purposes then you will need to configure it yourself. Here is a list of important steps you can take to secure your Linux system:
+In this project I demonstrate a number of different ways in which you can configure settings in Linux Ubuntu to inhance the security of the operating system. Although Linux is relatively secure and virus free out of the box, if you want enterprise level security for business purposes then you will need to configure it yourself. Here is a list of important steps you can take to secure your Linux system:
 - Ensure Physical Security.
 - Disable Booting from external media devices.
 - Boot Loader Protection.
@@ -13,13 +13,13 @@ In this project I demonstrate a number of different ways in which you can config
 - Check for Open Ports and stop the unnecessary ones.
 - Enforce Password Policy
 - Audit Passwords using John The Ripper.
-- Eliminate unused and well-known accounts that are not needed.
+- Eliminate unused and well-known accounts that are unnecessary.
 - Give users limited administrative access.
 - Do not use the root account on a regular basis and do not allow direct root login.
-- Set limits using the ulimit command to avoid DoS attacks such as launching a fork bomb.
+- Set limits using the ulimit command to avoid DoS attacks, such as launching a fork bomb.
 - Implement File Monitoring (Host IDS - AIDE).
 - Scan for Rootkits, Viruses and Malware (Rootkit Hunter, chkrootkit, ClamAV).
-- Use Disk Encryption to protect your data. Don’t forget to encrypt your backups aswell.
+- Use Disk Encryption to protect your data. Don’t forget to encrypt your backups as well.
 - Secure every Network Service especially SSHd.
 - Securing Your Linux System with a Firewall (Netfilter/Iptables).
 - Monitor the firewall and its logs.
@@ -34,7 +34,7 @@ In this project I demonstrate a number of different ways in which you can config
 ![Screenshot 2023-09-28 215038](https://github.com/Lachiecodes/Securing-and-Hardening-a-Linux-System/assets/138475757/7f02903a-a8e9-4bf0-82f3-2cfb3026d5c6)<br>
 
 - Make sure to create a backup of the sshd file before you edit it.
-- After editing the file you will have to restart the server so that the changes will come into affect.
+- After editing the file you will have to restart the server so that the changes will come into effect.
 - Change the default port of SSH from 22 to a random one of your own choosing will avoid you being seen by casual scans, but not targeted attacks: `Port 2278`.
 - Due to most SSH attacks on the internet being automated, changing the default port is highly recommended.
 - PermitRootLogin by default is set to prohibit-password but this still allows public key authentication and other such methods. It’s safer to disallow this one: `PermitRootLogin no`.
@@ -82,7 +82,7 @@ In this project I demonstrate a number of different ways in which you can config
 - It is not modified directly by the user, but by certain GRUB2 updates such as `update-grub2`.
 - In fact, grub uses a series of scripts to  update this file.
 - These are located in ls `/etc/grub.d`.
-- Its best to change a custom file such as `40_custom` because it will not be overwritten even with the GRUB package is overwritten.
+- Its best to change a custom file such as `40_custom` because it will not be overwritten even when the GRUB2 package is updated.
 - Copy your hashed password, starting at the `grub.pbkdf2.sha512…`
 - Open the custom file with: `sudo nano /etc/grub.d/40_custom`.<br>
 
@@ -138,7 +138,7 @@ In this project I demonstrate a number of different ways in which you can config
 
 ![Screenshot 2023-09-29 094945](https://github.com/Lachiecodes/Securing-and-Hardening-a-Linux-System/assets/138475757/1c516974-3a3f-45e8-8fc5-7574409c197e)<br>
 
-- Now that you have set these requirements, try to change your password to something that doesn’t fit and make sure that its all working!<br>
+- Now that you have set these requirements, try to change your password to something that doesn’t meet the criteria and make sure that its all working!<br>
 
 ![Screenshot 2023-09-29 095338](https://github.com/Lachiecodes/Securing-and-Hardening-a-Linux-System/assets/138475757/14e495cc-8608-4412-ba45-271085d6c5f9)
 
@@ -158,8 +158,8 @@ In this project I demonstrate a number of different ways in which you can config
 
 ![Screenshot 2023-10-03 091919](https://github.com/Lachiecodes/Securing-and-Hardening-a-Linux-System/assets/138475757/0eaad4c1-6cf0-497d-ae55-c52e7f3b20d6)<br>
 
-- To completely disable an account use the command: `sudo usermod --expiredate 1 user`. This sets the users account expiry date to 1 day after the Unix epoch, which is 00:00:00 UTC on 1 January 1 1970.
-- To check the expiration date run: `sudo chage -l user` and you should see the expiration date as the 02 January 1970.<br>
+- To completely disable an account, use the command: `sudo usermod --expiredate 1 user`. This sets the users account expiry date to 1 day after the Unix epoch, which is 00:00:00 UTC on 1 January 1 1970.
+- To check the expiration date run: `sudo chage -l user` and you should see the expiration date as 02 January 1970.<br>
 
 ![Screenshot 2023-10-03 092218](https://github.com/Lachiecodes/Securing-and-Hardening-a-Linux-System/assets/138475757/d0566ddf-cbb3-4f8a-b81e-f5c1277c8725)<br>
 
@@ -169,7 +169,7 @@ In this project I demonstrate a number of different ways in which you can config
 
 ## Giving Limited root Privileges
 - In Linux, any administrative command that changes the system in any way should be run as root.
-- The users that belong to the sudo group are allowed to run commands as root by using sudo before the command name.
+- The users that belong to the sudo group are allowed to run commands as root by using `sudo` before the command name.
 - To see the users that belong to the sudo group run: `grep sudo /etc/group`.<br>
 
 ![Screenshot 2023-10-03 093050](https://github.com/Lachiecodes/Securing-and-Hardening-a-Linux-System/assets/138475757/9f180bba-b919-493a-8754-4b231fa3c729)<br>
@@ -237,7 +237,7 @@ In this project I demonstrate a number of different ways in which you can config
 - Now run the script, and the system will crash: `./bomb`.
 - The only way to get out of this is to power cycle the machine.
 - The script is very simple DoS attack which makes use of the fork system call to create an infinite number of processes.
-- `$0` is a special variable which represents the script itself. So the script is running itself recursively two times and then is going in the background for another recursive call. `&` at the end puts the process in the background so new child processes cannot die and they start eating the system resources.
+- `$0` is a special variable which represents the script itself. So the script is running itself recursively two times and then is going in the background for another recursive call. `&` at the end puts the process in the background so new child processes cannot die and they start eating system resources.
 - To protect the system from this sort of attack, we need to set a limit on the number of process a user can run.
 - Using `ulimit -u` we can see the currently allowed number of processes allowed for the current user.<br>
 
@@ -251,7 +251,7 @@ In this project I demonstrate a number of different ways in which you can config
 ![Screenshot 2023-10-03 131700](https://github.com/Lachiecodes/Securing-and-Hardening-a-Linux-System/assets/138475757/ebe3adb1-9701-467c-b522-bc3c4a1ab0e2)
 
 - Now, log out and in again and try to run the ./bomb script again. As you can see, the system is still usable and did not crash.
-- Use the `ulimit -u` command you can also double check to confirm that your changes in /etc/security/limits.conf have worked.<br>
+- Use the `ulimit -u` command you can also double check to confirm that your changes in `/etc/security/limits.conf` have worked.<br>
 
 ![Screenshot 2023-10-03 131922](https://github.com/Lachiecodes/Securing-and-Hardening-a-Linux-System/assets/138475757/81242c69-03db-4b45-843c-684f8ca412df)<br>
 
@@ -276,7 +276,7 @@ In this project I demonstrate a number of different ways in which you can config
 - By default, `aidinit` checks a set of directories and files defined in `/etc/aide/aide.conf` and creates the baseline database.
 - We can check the newly created database by running: `ls -l /var/lib/aide`. It will be named `aide.db.new`.
 - After initialising the database you will need to move the newly created database to the one that it will be check against and its by default `aide.db`. Run the command: `mv /var/lib/aide/aide.db.new /var/lib/aide/aide.db`.
-- Now run a few commands to make some changes to your system. Such as: `sudo touch /root/abc.txt` and `sudo useradd user3`.
+- Now run a few commands to make some changes to your system, such as: `sudo touch /root/abc.txt` and `sudo useradd user3`.
 - Now lets test to see if AIDE is working. Run the command: `sudo aide -c /var/lib/aide/aide.conf.autogenerated --check > system-report.txt`.
 - Now wait for it to complete, and open the file to check any changes to the system: `less system-report.txt`.
 - If after reviewing the changes and determining they are ok, it is recommended to update the AIDE database with the new changes so they are not reported again on the next AIDE check.
