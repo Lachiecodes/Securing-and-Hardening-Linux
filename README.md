@@ -147,7 +147,7 @@ In this project I demonstrate a number of different ways in which you can config
 - One way in which we can do this is to lock password authentication for the user. Note that this does not entirely lock the user out of the account - they will still be able to log in using SSH public key authentication if it’s set.
 - Run the command: `sudo passwd -l user`.<br>
 
-![Screenshot 2023-10-03 091451](https://github.com/Lachiecodes/Securing-and-Hardening-a-Linux-System/assets/138475757/3fe3046f-03eb-4e0e-be90-4ea23d96e566)<br>
+![Screenshot 2023-10-03 091451](https://github.com/Lachiecodes/Securing-and-Hardening-a-Linux-System/assets/138475757/52ba19aa-1624-40e6-9d93-28b53eddfa64)<br>
 
 - To verify if the account is locked or disabled run the command: `sudo passwd --status user`. If you see a capital L it means its locked, NP means there is no password, and P means there is a valid password.
 - You can also check the hash of the password using: `sudo cat /etc/shadow`. The password will have an ! at the front of it, which is not a valid file hash.<br>
