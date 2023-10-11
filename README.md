@@ -262,7 +262,7 @@ In this project I demonstrate a number of different ways in which you can config
 - One possible layer of security that may be applied to your Linux server is file integrity monitoring or file integrity verification.
 - The purpose of monitoring and verifying the integrity of the important files including system binaries and configuration files is to make sure that the files have not been altered by unauthorised means.
 - The unauthorised alteration of certain system files is one of the symptoms of an active attack or a compromised system.
-- Once a hacker compromises a system they will start to modify configuration files, binaries and so on to consolidate his position and make it possible to return whenever they want.
+- Once a hacker compromises a system they will start to modify configuration files, binaries and so on to consolidate their position and make it possible to return whenever they want.
 - For example the `ls` and `ps` commands are often altered by rootkits so they don’t show files or processes belonging to the rootkit.
 - There are a number of solutions used to monitor the integrity of critical system files, one of those being AIDE.
 - Tripwire is a file integrity and monitoring or file integrity verification tool. It is a host-based IDS (HIDS).
@@ -348,7 +348,7 @@ In this project I demonstrate a number of different ways in which you can config
 ![Screenshot 2023-10-11 154748](https://github.com/Lachiecodes/Securing-and-Hardening-a-Linux-System/assets/138475757/0dd89bd1-8b9d-48cd-9dd2-5d95ed7b5269)
 
 - You can also automate Tripwire using a cronjob and configure it to send you email reports with the changes every day.
-- 
+
 ## Scanning for Rootkits (rkhunter and chkrootkit)
 - A rootkit is a collection of malicious computer software designed to enable access to a
 computer that is not otherwise allowed.
