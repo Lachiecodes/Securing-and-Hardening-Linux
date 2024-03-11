@@ -4,7 +4,7 @@
 
 
 ## Introduction
-In this project I demonstrate a number of different ways in which you can configure settings in Linux Ubuntu to inhance the security of the operating system. Although Linux is relatively secure and virus free out of the box, if you want enterprise level security for business purposes then you will need to configure it yourself. Here is a list of important steps you can take to secure your Linux system:
+In this project I demonstrate a number of different ways in which you can configure settings in Linux Ubuntu to enhance the security of the operating system. Although Linux is relatively secure and virus free out of the box, if you want enterprise level security for business purposes then you will need to configure it yourself. Here is a list of important steps you can take to secure your Linux system:
 - Ensure Physical Security.
 - Disable Booting from external media devices.
 - Boot Loader Protection.
